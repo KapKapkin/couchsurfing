@@ -142,10 +142,14 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'accounts.CustomUser'
 
+LOGIN_REDIRECT_URL = LOGOUT_REDIRECT_URL = 'home'
+
 # django-allauth conf
 
-LOGIN_REDIRECT_URL = 'home'
-ACCOUNT_LOGOUT_REDIRECT = 'home'
+ACCOUNT_LOGIN_REDIRECT_URL = 'home'
+ACCOUNT_LOGOUT_REDIRECT_URL = 'home'
+ACCOUNT_SIGNUP_REDIRECT_URL = 'home'
+
 
 SITE_ID = 1
 
@@ -154,16 +158,11 @@ AUTHENTICATION_BACKENDS = [
     'allauth.account.auth_backends.AuthenticationBackend'
 ]
 
-ACCOUNT_SESSION_REMEMBER = True
-ACCOUNT_SIGNUP_PASSWORD_ENTER_TWICE = False
-ACCOUNT_USERNAME_REQUIRED = False
-ACCOUNT_AUTHENTICATION_METHOD = 'email'
-ACCOUNT_EMAIL_REQUIRED = True
-ACCOUNT_UNIQUE_EMAIL = True
+
 
 ACCOUNT_FORMS = {
-    'login': 'accounts.forms.CustomUserCreationForm',
-    'signup': 'accounts.forms.CustomUserChangeForm',
+    'login': 'allauth.account.forms.LoginForm',
+    'signup': 'accounts.forms.CustomUserSignupForm',
     'add_email': 'allauth.account.forms.AddEmailForm',
     'change_password': 'allauth.account.forms.ChangePasswordForm',
     'set_password': 'allauth.account.forms.SetPasswordForm',
@@ -173,8 +172,16 @@ ACCOUNT_FORMS = {
 }
 
 # email config
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-DEFAULT_FROM_EMAIL = 'admin@djangobookstore.com'
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# DEFAULT_FROM_EMAIL = 'admin@djangobookstore.com'
+
+ACCOUNT_EMAIL_VERIFICATION = 'none'
+ACCOUNT_SESSION_REMEMBER = True
+ACCOUNT_SIGNUP_PASSWORD_ENTER_TWICE = False
+ACCOUNT_USERNAME_REQUIRED = False
+ACCOUNT_AUTHENTICATION_METHOD = 'email'
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_UNIQUE_EMAIL = True
 
 # crispy_forms
 
