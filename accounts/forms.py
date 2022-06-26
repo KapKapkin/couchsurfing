@@ -1,41 +1,49 @@
-from allauth.account.forms import SignupForm
 from django.contrib.auth.forms import (
     UserCreationForm,
     UserChangeForm,
 )
 from django.contrib.auth import get_user_model
-from django import forms
 from django.utils.translation import gettext_lazy as _
+from django import forms
 
 CustomUser = get_user_model()
 
 
-class CustomUserCreationForm(UserCreationForm):
-    class Meta:
-        model = CustomUser
-        fields = ('username', 'city', 'password')
-
-
 class CustomUserChangeForm(UserChangeForm):
+    address = forms.CharField(
+        max_length=100, required=True, widget=forms.HiddenInput())
+    town = forms.CharField(max_length=100, required=True,
+                           widget=forms.HiddenInput())
+    county = forms.CharField(
+        max_length=100, required=True, widget=forms.HiddenInput())
+    post_code = forms.CharField(
+        max_length=8, required=True, widget=forms.HiddenInput())
+    country = forms.CharField(
+        max_length=40, required=True, widget=forms.HiddenInput())
+    longitude = forms.CharField(
+        max_length=50, required=True, widget=forms.HiddenInput())
+    latitude = forms.CharField(
+        max_length=50, required=True, widget=forms.HiddenInput())
+
     class Meta:
         model = CustomUser
-        fields = ('username', 'city', 'password')
+        fields = ('address', 'town', 'county', 'post_code',
+                  'country', 'longitude', 'latitude')
 
 
-class CustomUserSignupForm(SignupForm):
-    def __init__(self, *args, **kwargs):
-        super(CustomUserSignupForm, self).__init__(*args, **kwargs)
-        self.fields["first_name"] = forms.CharField(
-            label='first name', max_length=100, required=False)
-        self.fields["last_name"] = forms.CharField(
-            label='last name', max_length=100, required=False)
-        self.fields["city"] = forms.CharField(
-            label='City', max_length=100, required=False)
+class CustomUserSignupForm(UserCreationForm):
+    email = forms.EmailField(max_length=254, required=True,
+                             widget=forms.TextInput(attrs={'placeholder': '*Email..'}))
+    name = forms.CharField(max_length=30, required=True,
+                           widget=forms.TextInput(attrs={'placeholder': '*Your name..'}))
+    password1 = forms.CharField(
+        widget=forms.PasswordInput(attrs={'placeholder': '*Password..', 'class': 'password'}))
+    password2 = forms.CharField(
+        widget=forms.PasswordInput(attrs={'placeholder': '*Password Confirm..', 'class': 'password'}))
+    # reCAPTCHA token
+    token = forms.CharField(
+        widget=forms.HiddenInput())
 
-    def save(self, request):
-        user = super(CustomUserSignupForm, self).save(request)
-        user.ifirst_name = self.cleaned_data['first_name']
-        user.last_name = self.cleaned_data['last_name']
-        user.city = self.cleaned_data["city"]
-        user.save()
-        return user
+    class Meta:
+        model = CustomUser
+        fields = ('email', 'name', 'password1', 'password2')

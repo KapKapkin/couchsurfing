@@ -5,25 +5,22 @@ from django.urls import reverse
 class AccountsTests(TestCase):
     username = 'testusername'
     email = 'test@example.com'
-    first_name = 'testuser'
-    last_name = 'testuser1'
+    name = 'testuser1'
     password = 'testpassword123'
-    city = 'testcity'
+    town = 'testtown'
 
     def test_create_user(self):
         user = get_user_model().objects.create(
             email=self.email,
             username=self.username,
-            first_name=self.first_name,
-            last_name=self.last_name,
+            name=self.last_name,
             password=self.password,
-            city=self.city,
+            town=self.town,
         )
         self.assertEqual(user.email, self.email)
         self.assertEqual(user.username, self.username)
-        self.assertEqual(user.first_name, self.first_name)
-        self.assertEqual(user.last_name, self.last_name)
-        self.assertEqual(user.city, self.city)
+        self.assertEqual(user.name, self.name)
+        self.assertEqual(user.town, self.town)
         self.assertTrue(user.is_active)
         self.assertFalse(user.is_superuser)
         self.assertFalse(user.is_staff)
@@ -32,17 +29,15 @@ class AccountsTests(TestCase):
         user = get_user_model().objects.create_superuser(
             email=self.email,
             username=self.username,
-            first_name=self.first_name,
-            last_name=self.last_name,
+            name=self.name,
             password=self.password,
-            city=self.city,
+            town=self.town,
         )
 
         self.assertEqual(user.email, self.email)
         self.assertEqual(user.username, self.username)
-        self.assertEqual(user.first_name, self.first_name)
-        self.assertEqual(user.last_name, self.last_name)
-        self.assertEqual(user.city, self.city)
+        self.assertEqual(user.name, self.name)
+        self.assertEqual(user.town, self.town)
         self.assertTrue(user.is_active)
         self.assertTrue(user.is_superuser)
         self.assertTrue(user.is_staff)
@@ -53,7 +48,7 @@ class SignUpTest(TestCase):
     first_name = 'testuser'
     last_name = 'testuser1'
     password = 'testpassword123'
-    city = 'testcity'
+    town = 'testtown'
 
     def setUp(self):
         url = reverse('account_signup')

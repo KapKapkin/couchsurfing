@@ -135,8 +135,9 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 STATICFILES_DIRS = [
-    BASE_DIR / 'static_root',
+    BASE_DIR / 'static',
 ]
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_FINDERS = [
     "django.contrib.staticfiles.finders.FileSystemFinder",
     "django.contrib.staticfiles.finders.AppDirectoriesFinder",
@@ -144,6 +145,15 @@ STATICFILES_FINDERS = [
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+
+# GOOGLE CONF
+
+RECAPTCHA_KEY=os.getenv('RECAPTCHA_KEY')
+RECAPTCHA_SECRET_KEY=os.getenv('RECAPTCHA_SECRET_KEY')
+GOOGLE_API_KEY=os.getenv('GOOGLE_API_KEY')
+RECAPTCHA_USE_SSL = True
+BASE_COUNTRY='rus'
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
@@ -196,3 +206,4 @@ ACCOUNT_UNIQUE_EMAIL = True
 # crispy_forms
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
+
