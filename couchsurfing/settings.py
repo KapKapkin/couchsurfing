@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -19,7 +20,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
-import os
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.getenv('SECRET_KEY')
@@ -41,15 +41,17 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.sites',
 
-    # 3rd party 
+    # 3rd party
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
     'crispy_forms',
-    
+    'channels',
+
     # local
     'accounts.apps.AccountsConfig',
     'world.apps.WorldConfig',
+    'chat.apps.ChatConfig',
 ]
 
 MIDDLEWARE = [
@@ -148,11 +150,11 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 # GOOGLE CONF
 
-RECAPTCHA_KEY=os.getenv('RECAPTCHA_KEY')
-RECAPTCHA_SECRET_KEY=os.getenv('RECAPTCHA_SECRET_KEY')
-GOOGLE_API_KEY=os.getenv('GOOGLE_API_KEY')
+RECAPTCHA_PUBLIC_KEY = os.getenv('RECAPTCHA_PUBLIC_KEY')
+RECAPTCHA_SECRET_KEY = os.getenv('RECAPTCHA_SECRET_KEY')
+GOOGLE_API_KEY = os.getenv('GOOGLE_API_KEY')
 RECAPTCHA_USE_SSL = True
-BASE_COUNTRY='rus'
+BASE_COUNTRY = 'UK'
 
 
 # Default primary key field type
@@ -179,10 +181,8 @@ AUTHENTICATION_BACKENDS = [
 ]
 
 
-
 ACCOUNT_FORMS = {
     'login': 'allauth.account.forms.LoginForm',
-    'signup': 'accounts.forms.CustomUserSignupForm',
     'add_email': 'allauth.account.forms.AddEmailForm',
     'change_password': 'allauth.account.forms.ChangePasswordForm',
     'set_password': 'allauth.account.forms.SetPasswordForm',
@@ -207,3 +207,21 @@ ACCOUNT_UNIQUE_EMAIL = True
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
+# channels conf
+
+ASGI_APPLICATION = 'couchsurfing.asgi.application'
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'config': {
+            'host': [
+                ('localhost', '127.0.0.1'),
+            ],
+            'symmetric_encryption_keys': [
+                SECRET_KEY,
+            ]
+
+
+        }
+    }
+}
