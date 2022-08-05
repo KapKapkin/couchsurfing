@@ -3,24 +3,16 @@ from django.contrib.auth import get_user_model
 from django.urls import reverse
 
 class AccountsTests(TestCase):
-    username = 'testusername'
     email = 'test@example.com'
-    name = 'testuser1'
     password = 'testpassword123'
-    town = 'testtown'
 
     def test_create_user(self):
         user = get_user_model().objects.create(
             email=self.email,
-            username=self.username,
-            name=self.last_name,
             password=self.password,
-            town=self.town,
+
         )
         self.assertEqual(user.email, self.email)
-        self.assertEqual(user.username, self.username)
-        self.assertEqual(user.name, self.name)
-        self.assertEqual(user.town, self.town)
         self.assertTrue(user.is_active)
         self.assertFalse(user.is_superuser)
         self.assertFalse(user.is_staff)
@@ -28,16 +20,9 @@ class AccountsTests(TestCase):
     def test_create_super_user(self):
         user = get_user_model().objects.create_superuser(
             email=self.email,
-            username=self.username,
-            name=self.name,
             password=self.password,
-            town=self.town,
         )
-
         self.assertEqual(user.email, self.email)
-        self.assertEqual(user.username, self.username)
-        self.assertEqual(user.name, self.name)
-        self.assertEqual(user.town, self.town)
         self.assertTrue(user.is_active)
         self.assertTrue(user.is_superuser)
         self.assertTrue(user.is_staff)
@@ -45,11 +30,8 @@ class AccountsTests(TestCase):
 class SignUpTest(TestCase):
 
     email = 'test@example.com'
-    first_name = 'testuser'
-    last_name = 'testuser1'
     password = 'testpassword123'
-    town = 'testtown'
-
+    
     def setUp(self):
         url = reverse('account_signup')
         self.response = self.client.get(url)

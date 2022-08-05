@@ -54,5 +54,5 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
         return reverse('profile', kwargs={'pk': self.id})
 
     def __str__(self):
-        return self.username
+        return self.name if self.name else ''
     

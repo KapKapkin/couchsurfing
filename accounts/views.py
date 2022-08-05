@@ -1,31 +1,110 @@
-from django.shortcuts import redirect, render
-from django.urls import reverse_lazy
-from django.views.generic import DetailView, ListView, UpdateView
+from django.http import Http404, JsonResponse
+from django.shortcuts import render, redirect, reverse
+from django.views.generic import UpdateView, DetailView
+from django.views.generic.edit import FormView
+from django.conf import settings
+from django.contrib.auth import get_user_model, login
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.utils.decorators import method_decorator
 
-
-from django.contrib.auth import get_user_model
-from .forms import CustomUserChangeForm
+from couchsurfing.mixins import (
+    AjaxFormMixin,
+    reCAPTCHAValidation,
+    FormErrors,
+    RedirectParams,
+    Directions,
+)
+from .forms import (
+    UserAddressForm,
+    CustomUserSignupForm,
+    CustomUserChangeForm,
+)
 
 CustomUser = get_user_model()
+result = "Error"
+message = "There was an error, please try again"
 
-class UserDetailView(LoginRequiredMixin, DetailView):
+
+class AccountView(DetailView):
     model = CustomUser
-    context_object_name = 'user'
+    context_object_name = 'profile_user'
     template_name = 'account/profile.html'
     login_url = 'account_login'
 
+    @method_decorator(login_required)
+    def dispatch(self, *args, **kwargs):
+        return super().dispatch(*args, **kwargs)
 
-class UserListView(LoginRequiredMixin, ListView):
-    model = CustomUser
-    context_object_name = 'user'
-    login_url = 'account_login'
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['request_user'] = self.request.user
+        return context
 
-    def get_queryset(self):
-        query = self.request.GET.get('q')
-        return CustomUser.objects.filter(
-            city__icontains=query,
-        )
+
+def profile_view(request):
+    '''
+    function view to allow users to update their profile
+    '''
+    user = request.user
+    up = user.userprofile
+
+    form = UserAddressForm(instance=up)
+
+    if request.is_ajax():
+        form = UserAddressForm(data=request.POST, instance=up)
+        if form.is_valid():
+            obj = form.save()
+            obj.has_profile = True
+            obj.save()
+            result = "Success"
+            message = "Your profile has been updated"
+        else:
+            message = FormErrors(form)
+        data = {'result': result, 'message': message}
+        return JsonResponse(data)
+
+    else:
+
+        context = {'form': form}
+        context['google_api_key'] = settings.GOOGLE_API_KEY
+        context['base_country'] = settings.BASE_COUNTRY
+
+        return render(request, 'users/profile.html', context)
+
+
+class UserSignUpView(AjaxFormMixin, FormView):
+    template_name = 'account/signup.html'
+    form_class = CustomUserSignupForm
+    success_url = '/'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['recaptcha_site_key'] = settings.RECAPTCHA_PUBLIC_KEY
+        return context
+
+    def form_valid(self, form):
+        response = super(AjaxFormMixin, self).form_valid(form)
+        if self.request.is_ajax():
+            token = form.cleaned_data['token']
+            captcha = reCAPTCHAValidation(token)
+            if captcha['success']:
+                obj = form.save()
+                obj.email = obj.username
+                obj.save()
+                up = obj.userprofile
+                up.captcha_score = float(captcha['score'])
+                up.save()
+
+                login(self.request, obj,
+                      backend='django.contrib.auth.backends.ModelBackend')
+
+                result = 'Success'
+                message = 'Thank you for signing up.'
+            data = {'result': result, 'message': message}
+            return JsonResponse(data)
+        return response
+
 
 class UserChangeView(LoginRequiredMixin, UpdateView):
     model = CustomUser
@@ -37,5 +116,7 @@ class UserChangeView(LoginRequiredMixin, UpdateView):
         super(UserChangeView, self).post(request, *args, **kwargs)
         return redirect(request.user.get_absolute_url())
 
-
-
+    def get_object(self, queryset=None):
+        user = super(UserChangeView, self).get_object(queryset)
+        if user.id != self.request.user.id:
+            raise Http404()
