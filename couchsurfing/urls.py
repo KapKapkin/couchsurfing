@@ -28,6 +28,7 @@ urlpatterns = [
 
     # local apps
     path('accounts/', include('accounts.urls')),
+    path('chat/', include('chat.urls')),
     path('', include('pages.urls')),
 ]
 

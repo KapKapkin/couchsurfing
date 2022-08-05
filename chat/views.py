@@ -1,4 +1,11 @@
-from django.views.generic import TemplateView
+from django.shortcuts import render
+from django.views.generic import ListView, TemplateView
+from .models import PrivateChatRoom
 
-class ChatView(TemplateView):
-    template_name = 'chat/chat.html'
+def index(request):
+    return render(request, 'chat/index.html')
+
+def chat_room(request, room_name):
+    return render(request, 'chat/chat.html', context={
+        'room_name': room_name
+    })

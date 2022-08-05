@@ -212,16 +212,17 @@ CRISPY_TEMPLATE_PACK = 'bootstrap4'
 ASGI_APPLICATION = 'couchsurfing.asgi.application'
 CHANNEL_LAYERS = {
     'default': {
-        'BACKEND': 'channels_redis.core.RedisChannelLayer',
-        'config': {
-            'host': [
-                ('localhost', '127.0.0.1'),
-            ],
-            'symmetric_encryption_keys': [
-                SECRET_KEY,
-            ]
-
-
-        }
+        'BACKEND': 'channels.layers.InMemoryChannelLayer',
+        # 'CONFIG': {
+        #     'hosts': [('redis', 6379)],
+        #     'symmetric_encryption_keys': [
+        #         SECRET_KEY,
+        #     ]
+        # }
     }
 }
+ 
+# REDIS conf
+
+REDIS_HOST = 'localhost'
+REDIS_PORT = 6379

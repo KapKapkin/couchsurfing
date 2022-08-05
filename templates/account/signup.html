@@ -3,11 +3,30 @@
 
 {% block title %}Sign Up{% endblock title %}
 
+{% block extend_head %}
+<script src='https://www.google.com/recaptcha/api.js?render={{recaptcha_site_key}}'></script>
+{% endblock %}
+
 {% block content %}
-<h2>Log In</h2>
-<form method="post">
+
+<h2>Sign Up</h2>
+<form method="post" id="signupform">
+
 {% csrf_token %}
-{{ form|crispy }}
+
+{{ form|crispy  }}
+
 <button class="btn btn-success" type="submit">Sign In</button>
+
 </form>
+
 {% endblock content %}
+
+{% block extend_footer %}
+<script type="text/javascript">
+    // Create a variable that can be used in main.js
+    var recaptcha_site_key = '{{recaptcha_site_key|safe}}'
+  </script>
+{% endblock %}
+
+

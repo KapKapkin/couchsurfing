@@ -1,0 +1,47 @@
+{% extends '_base.html' %}
+
+{% block content %}
+
+<form id="form">
+    <input type="text" name="message">
+</form>
+
+<div id="messages"></div>
+
+{{ room_name|json_script:"room-name" }}
+<script>
+    const roomName = JSON.parse(document.getElementById('room-name').textContent);
+    const chatSocket = new WebSocket(
+        'ws://'
+        + window.location.host
+        + '/ws/chat/'
+        + roomName
+        + '/'
+    );
+
+    chatSocket.onmessage = function (e) {
+        const data = JSON.parse(e.data);
+        console.log(data)
+
+        if(data.type === 'chat'){
+            let messages = document.getElementById('messages')
+            
+            messages.insertAdjacentHTML('beforeend',    `<div>
+                                                            <p>${data.message}</p>
+                                                        </div>`)
+        }
+    };
+
+    let form = document.getElementById('form');
+    form.addEventListener('submit', (e)=> {
+        e.preventDefault();
+        let message = e.target.message.value;
+        chatSocket.send(JSON.stringify({
+            'message': message,
+        }))
+        form.reset()
+    });
+    
+</script>
+
+{% endblock content %}

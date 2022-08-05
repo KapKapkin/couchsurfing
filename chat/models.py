@@ -1,12 +1,23 @@
 from django.db import models 
 from django.conf import settings 
+from django.db import models
+from django.utils.translation import gettext_lazy as _
+import uuid
 
 class PrivateChatRoom(models.Model):
-    title = models.CharField(max_length=255,)
+    
+    id = models.UUIDField(_('id'), 
+        primary_key=True, 
+        default=uuid.uuid4,
+        editable=False,
+        db_index=True,
+        unique=True,)
+    
+    title = models.CharField(max_length=255)
     users = models.ManyToManyField(settings.AUTH_USER_MODEL, blank=True, help_text="Users who are in this chat")
     
     def __str__(self):
-        return self.title
+        return self.title 
 
     def connect_user(self, user):
         '''
@@ -58,5 +69,5 @@ class PrivateRoomChatMessage(models.Model):
     objects = PrivateChatRoomMessageManager()
     
     def __str__(self):
-        return self.content
+        return self.content if self.content else ''
 
