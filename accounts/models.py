@@ -1,12 +1,15 @@
-from django.db import models
-from django.contrib.auth.models import AbstractBaseUser
-from django.utils.translation import gettext_lazy as _
-from django.urls import reverse
-from django.contrib.auth.models import PermissionsMixin
-from django.utils import timezone
+import json
 import uuid
-from .managers import CustomUserManager
+import datetime
 
+from django.db import models
+from django.core import serializers
+from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
+from django.utils.translation import gettext_lazy as _
+from django.utils import timezone
+from django.urls import reverse
+
+from .managers import CustomUserManager
 
 class CustomUser(AbstractBaseUser, PermissionsMixin):
     id = models.UUIDField(
@@ -31,8 +34,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     latitude = models.CharField(verbose_name="Latitude",max_length=50, null=True, blank=True)
     
     about_me = models.CharField(_('About Me'), max_length=300, blank=True)
-    avatar = models.ImageField(upload_to='avatars/', blank=True)
-    room_image = models.ImageField(upload_to='rooms/', blank=True)
+    avatar = models.ImageField(upload_to='avatars/', default='avatars/default_avatar.png')
     
     EMAIL_FIELD = 'email'
     USERNAME_FIELD = 'email'
@@ -53,6 +55,9 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     def get_absolute_url(self):
         return reverse('profile', kwargs={'pk': self.id})
 
-    def __str__(self):
-        return self.name if self.name else ''
+    def toJSON(self):
+        serialized_obj = serializers.serialize('json', [self, ], fields=['id', 'name', 'email', 'address', 'town', 'county',])
+        return serialized_obj
+
+
     

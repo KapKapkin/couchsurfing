@@ -1,47 +1,95 @@
 {% extends '_base.html' %}
+{% load static %}
+
+{% block extend_head %}
+
+<link rel="stylesheet" href="{% static 'css/chat.css'%}">
+
+{% endblock %}
 
 {% block content %}
+
 
 <form id="form">
     <input type="text" name="message">
 </form>
 
-<div id="messages"></div>
+<div id="messages">
+    {% for message in messages %}
+    {% if user != message.user %}
+    <div class="message">
+        <p>
+            {{message.content}}
+        </p>
+    </div>
+    {% else %}
+    <div class="message bg-blue">
+        <p>
+            
+            {{message.content}}
+        </p>
+    </div>
+    {% endif %}
+    {% endfor %}
+</div>
 
-{{ room_name|json_script:"room-name" }}
+
+
+{% endblock %}
+
+{% block extend_footer %}
+
+
 <script>
-    const roomName = JSON.parse(document.getElementById('room-name').textContent);
     const chatSocket = new WebSocket(
         'ws://'
         + window.location.host
         + '/ws/chat/'
-        + roomName
+        + '{{chat_room.id}}'
         + '/'
     );
 
     chatSocket.onmessage = function (e) {
         const data = JSON.parse(e.data);
         console.log(data)
-
-        if(data.type === 'chat'){
+        if (data.type == 'chat') {
             let messages = document.getElementById('messages')
-            
-            messages.insertAdjacentHTML('beforeend',    `<div>
+            if (data.user['id'] != `{{user.id}}`){
+                messages.insertAdjacentHTML('beforeend', `<div class='message'>
                                                             <p>${data.message}</p>
-                                                        </div>`)
-        }
+                                                        </div>`
+                                                        )
+            }
+            else {
+                messages.insertAdjacentHTML('beforeend', `<div class='message bg-blue'>
+                                                            <p>${data.message}</p>
+                                                        </div>`
+                                                        )
+            }
+             
+            }
+        
+   
     };
 
     let form = document.getElementById('form');
-    form.addEventListener('submit', (e)=> {
+    form.addEventListener('submit', (e) => {
         e.preventDefault();
         let message = e.target.message.value;
+        console.log([`{{user.toJSON|safe}}`,])
         chatSocket.send(JSON.stringify({
             'message': message,
+            'room': `{{chat_room.toJSON|safe}}`,
+            'user': `{{user.toJSON|safe}}`
+
         }))
         form.reset()
     });
-    
+
+    function CreateMessage(data) {
+
+    };
+
 </script>
 
-{% endblock content %}
+{% endblock %}

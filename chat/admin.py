@@ -6,7 +6,7 @@ from django.db import models
 from .models import PrivateChatRoom, PrivateRoomChatMessage 
 
 class PrivateChatRoomAdmin(admin.ModelAdmin):
-    list_display = ['id', 'title']
+    list_display = ['id']
     class Meta:
         model = PrivateChatRoom
 

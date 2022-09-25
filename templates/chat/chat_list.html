@@ -1,0 +1,32 @@
+{% extends '_base.html' %}
+
+{% load static %}
+
+{% block extend_head %}
+<link href="{% static 'css/chat_list.css' %}" rel="stylesheet">
+{% endblock %}
+
+
+{% block content %}
+<div class="card-list">
+    {% for chat in chat_list %}
+    <a href="{% url 'room' pk=chat.id %}">
+        {% for user_queue in chat.users.all %}
+        {% if user_queue != user %}
+
+        <div class="card-body bg-dark">
+            <div class="row-auto">
+                <div class="col-auto">
+                    <img src="{{ user_queue.avatar.url }}" class="avatar">
+                </div>
+                <div class="col">
+                    {{ user.name }}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        {% endfor %}
+    </a>
+    {% endfor %}
+</div>
+{% endblock %}

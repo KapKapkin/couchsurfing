@@ -1,0 +1,9 @@
+.message {
+    border-radius: 50%;
+    background-color: #181515;
+    width: 100px;
+    text-align: center;
+}
+.bg-blue {
+    background-color: #00f;
+}

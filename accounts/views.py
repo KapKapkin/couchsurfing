@@ -14,6 +14,7 @@ from couchsurfing.mixins import (
     FormErrors,
     RedirectParams,
     Directions,
+    is_ajax,
 )
 from .forms import (
     UserAddressForm,
@@ -47,11 +48,11 @@ def profile_view(request):
     function view to allow users to update their profile
     '''
     user = request.user
-    up = user.userprofile
+    up = user
 
     form = UserAddressForm(instance=up)
 
-    if request.is_ajax():
+    if is_ajax(request):
         form = UserAddressForm(data=request.POST, instance=up)
         if form.is_valid():
             obj = form.save()
@@ -85,14 +86,13 @@ class UserSignUpView(AjaxFormMixin, FormView):
 
     def form_valid(self, form):
         response = super(AjaxFormMixin, self).form_valid(form)
-        if self.request.is_ajax():
+        if is_ajax(self.request):
             token = form.cleaned_data['token']
             captcha = reCAPTCHAValidation(token)
             if captcha['success']:
                 obj = form.save()
-                obj.email = obj.username
                 obj.save()
-                up = obj.userprofile
+                up = obj
                 up.captcha_score = float(captcha['score'])
                 up.save()
 
@@ -120,3 +120,4 @@ class UserChangeView(LoginRequiredMixin, UpdateView):
         user = super(UserChangeView, self).get_object(queryset)
         if user.id != self.request.user.id:
             raise Http404()
+        return user

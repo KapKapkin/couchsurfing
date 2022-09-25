@@ -8,6 +8,7 @@ from humanfriendly import format_timespan
 from django.http import JsonResponse
 
 
+
 def FormErrors(*args):
     message = ''
     for f in args:
@@ -15,6 +16,11 @@ def FormErrors(*args):
             message = f.errors.as_text()
     return message
 
+def is_ajax(request):
+    '''
+    return True if request is an AJAX request
+    '''
+    return request.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest'
 
 def reCAPTCHAValidation(token):
     result = requests.post(
@@ -40,16 +46,16 @@ def RedirectParams(**kwargs):
 class AjaxFormMixin(object):
     def form_invalid(self, form):
         response = super(AjaxFormMixin, self).form_invalid(form)
-        if self.request.is_ajax():
+        if is_ajax(self.request):
             message = FormErrors(form)
             return JsonResponse({'result': 'Error', 'message': message})
         return response
 
     def form_valid(self, form):
         response = super(AjaxFormMixin, self).form_valid(form)
-        if self.request.is_ajax():
+        if is_ajax(self.request):
             form.save()
-            return JsonResponse({'result': 'Succes', 'message': ''})
+            return JsonResponse({'result': 'Success', 'message': ''})
         return response
 
 

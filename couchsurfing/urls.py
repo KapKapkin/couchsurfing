@@ -27,9 +27,11 @@ urlpatterns = [
     path('accounts/', include('allauth.urls')),
 
     # local apps
+    path('', include('pages.urls')),
+    path('api/', include('api.urls')),
     path('accounts/', include('accounts.urls')),
     path('chat/', include('chat.urls')),
-    path('', include('pages.urls')),
+    
 ]
 
 if settings.DEBUG:

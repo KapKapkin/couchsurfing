@@ -80,7 +80,6 @@ function DirectionsToggle(){
               CustomFormSubmitPost($('#signupform button[type=submit]'));
   
               grecaptcha.ready(function() {
-                console.log(recaptcha_site_key)
                 grecaptcha.execute(recaptcha_site_key, {action: "/"}).then(function(token) {
   
                   document.getElementById('id_token').value = token;

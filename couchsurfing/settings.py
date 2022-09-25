@@ -46,12 +46,14 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'crispy_forms',
-    'channels',
+    'channels', 
+    'rest_framework',
 
     # local
     'accounts.apps.AccountsConfig',
     'world.apps.WorldConfig',
     'chat.apps.ChatConfig',
+    'posts.apps.PostsConfig',
 ]
 
 MIDDLEWARE = [
@@ -212,13 +214,13 @@ CRISPY_TEMPLATE_PACK = 'bootstrap4'
 ASGI_APPLICATION = 'couchsurfing.asgi.application'
 CHANNEL_LAYERS = {
     'default': {
-        'BACKEND': 'channels.layers.InMemoryChannelLayer',
-        # 'CONFIG': {
-        #     'hosts': [('redis', 6379)],
-        #     'symmetric_encryption_keys': [
-        #         SECRET_KEY,
-        #     ]
-        # }
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            'hosts': [('redis', 6379)],
+            'symmetric_encryption_keys': [
+                SECRET_KEY,
+            ]
+        }
     }
 }
  
